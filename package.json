@@ -1,20 +1,23 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.ts",
-  "scripts": {
-    "start": "node index.ts",
-    "dev": "node index.ts --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "engines": {
-    "node": "24"
-  },
-  "devDependencies": {
-    "biome": "^0.3.3"
-  }
+	"name": "server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.ts",
+	"scripts": {
+		"start": "node index.ts",
+		"dev": "node --watch index.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"engines": {
+		"node": "24"
+	},
+	"devDependencies": {
+		"biome": "^0.3.3"
+	},
+	"dependencies": {
+		"openai": "^6.15.0"
+	}
 }
