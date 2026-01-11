@@ -5,6 +5,8 @@ on: [push, workflow_dispatch]
 jobs:
   get-news:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

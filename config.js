@@ -1,6 +1,12 @@
+import fs from "node:fs"
+import path from "node:path"
 import { loadEnvFile } from "node:process"
 
-loadEnvFile()
+const envPath = path.resolve(process.cwd(), ".env")
+
+if (fs.existsSync(envPath)) {
+	loadEnvFile(envPath)
+}
 
 const { OPENAI_API_KEY } = process.env
 
