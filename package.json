@@ -5,6 +5,7 @@
 	"main": "index.ts",
 	"scripts": {
 		"start": "node index.ts",
+		"get-news": "node get-news.ts",
 		"dev": "node --watch index.ts"
 	},
 	"keywords": [],

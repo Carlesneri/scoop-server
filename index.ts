@@ -69,7 +69,7 @@ const input: ResponseInput = [
 	},
 ]
 
-async function getNews() {
+export async function getNews() {
 	try {
 		const response = await openai.responses.create({
 			model: "gpt-5-mini",
@@ -77,25 +77,17 @@ async function getNews() {
 			tools: [{ type: "web_search_preview" }],
 		})
 
-		console.log({ response })
-
-		const parsed = (await JSON.parse(response.output_text)) as {
+		const { items } = (await JSON.parse(response.output_text)) as {
 			feeds: [string]
 			items: NewsItem[]
 		}
 
-		console.log({ parsed })
+		console.log({ items })
 
-		return parsed.items
+		return items
 	} catch (e) {
-		console.error({ e })
+		console.error(e)
 
 		return []
 	}
 }
-
-const news = await getNews()
-
-news.forEach((item) => {
-	console.log({ item: JSON.stringify(item) })
-})
