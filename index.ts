@@ -3,12 +3,12 @@ import type { ResponseInput } from "openai/resources/responses/responses.mjs"
 import { OPENAI_API_KEY } from "./config.ts"
 import type { NewsItem } from "./types.ts"
 
-const itemInterface = {
-	title: "string",
-	summary: "string",
-	urls: [{ link: "string", source: "string" }],
-	images: [{ link: "string", source: "string" }],
-}
+// const itemInterface = {
+// 	title: "string",
+// 	summary: "string",
+// 	urls: [{ link: "string", source: "string" }],
+// 	images: [{ link: "string", source: "string" }],
+// }
 
 const responseExample = {
 	feeds: ["feed-one", "feed-two"],
@@ -58,12 +58,13 @@ const RSS_LIST = [
 const input: ResponseInput = [
 	{
 		role: "system",
-		content: `I am a news RSS analyzer that delivers news analyzing RSS, that is an array of items that must meet the contract: "${JSON.stringify(itemInterface)}".
+		content: `I am a news RSS analyzer that delivers news analyzing RSS.
 		The response must be a valid JSON with the following structure: "${JSON.stringify(responseExample)}".
     Each item refers to a news item and groups all the information from all sources, with the corresponding links to each media outlet.
     The images should be proper image type format, from the respective related RSS feeds.
     The RSS I will analyze are: "${JSON.stringify(RSS_LIST)}"
-		If I can not get results, I will return an empty array.
+		If some RSS is blocked by network just ignore them.
+		If all content is unreachable, retrun an empty array.
 		`,
 	},
 	{
