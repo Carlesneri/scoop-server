@@ -79,16 +79,12 @@ export async function getNews() {
 			tools: [{ type: "web_search_preview" }],
 		})
 
-		console.log({ response })
-
 		const parsed = (await JSON.parse(response.output_text)) as {
 			feeds: [string]
 			items: NewsItem[]
 		}
 
 		const { items } = parsed
-
-		console.log({ items })
 
 		return items
 	} catch (e) {
