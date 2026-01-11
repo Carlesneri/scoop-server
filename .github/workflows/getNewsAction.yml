@@ -1,10 +1,7 @@
 name: Get News
-
-on:
-   schedule:
-     - cron: "5 * * * *"
-
-
+on: [push, workflow_dispatch]
+  #  schedule:
+  #    - cron: "5 * * * *"
 jobs:
   get-news:
     runs-on: ubuntu-latest
