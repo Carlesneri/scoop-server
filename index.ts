@@ -1,7 +1,7 @@
 import OpenAI from "openai"
 import type { ResponseInput } from "openai/resources/responses/responses.mjs"
-import { OPENAI_API_KEY } from "./config.js"
-import type { NewsItem } from "./types.js"
+import { OPENAI_API_KEY } from "./config.ts"
+import type { NewsItem } from "./types.ts"
 
 const itemInterface = {
 	title: "string",
@@ -46,10 +46,9 @@ const openai = new OpenAI({
 
 const RSS_LIST = [
 	"https://feedx.net/rss/ap.xml",
-
-	// "https://feeds.bbci.co.uk/news/rss.xml",
-	// "http://rss.cnn.com/rss/cnn_topstories.rss",
-	// "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+	"https://feeds.bbci.co.uk/news/rss.xml",
+	"http://rss.cnn.com/rss/cnn_topstories.rss",
+	"https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
 
 	// "https://www.infolibre.es/rss",
 	// "https://www.eldiario.es/rss",

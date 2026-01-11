@@ -8,6 +8,5 @@ if (fs.existsSync(envPath)) {
 	loadEnvFile(envPath)
 }
 
-const { OPENAI_API_KEY } = process.env
-
-export { OPENAI_API_KEY }
+export const { OPENAI_API_KEY, TURSO_DATABASE_URL, TURSO_AUTH_TOKEN } =
+	process.env
