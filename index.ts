@@ -85,6 +85,8 @@ export async function getNews() {
 
 		const { items } = parsed
 
+		console.log({ items })
+
 		return items
 	} catch (e) {
 		console.error(e)
