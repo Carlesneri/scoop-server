@@ -61,7 +61,7 @@ const input: ResponseInput = [
 		content: `I am a news RSS analyzer that delivers news analyzing RSS, that is an array of items that must meet the contract: "${JSON.stringify(itemInterface)}".
 		The response must be a JSON with the following structure: "[${JSON.stringify(responseExample)}]".
     Each item refers to a news item and groups all the information from all sources, with the corresponding links to each media outlet.
-    The images should be proper image type format.
+    The images should be proper image type format, from the respective related RSS feeds.
     The RSS I will analyze are: "${JSON.stringify(RSS_LIST)}"
 		If I can not get results, I will return an empty array.
 		`,
