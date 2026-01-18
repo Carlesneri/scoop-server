@@ -1,3 +1,4 @@
+import { encode } from "@toon-format/toon"
 import OpenAI from "openai"
 import type { ResponseInput } from "openai/resources/responses/responses.mjs"
 import { OPENAI_API_KEY } from "./config.ts"
@@ -11,7 +12,6 @@ import type { NewsItem } from "./types.ts"
 // }
 
 const responseExample = {
-	feeds: ["feed-one", "feed-two"],
 	items: [
 		{
 			title: "Example title",
@@ -55,45 +55,81 @@ const RSS_LIST = [
 	// "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/ultimas-noticias/portada",
 ]
 
-const input: ResponseInput = [
-	{
-		role: "system",
-		content: `I am a news RSS analyzer that delivers news analyzing RSS.
+async function createRSSInput(rss: string): Promise<ResponseInput> {
+	const feedContent = await fetch(rss).then((res) => res.text())
+
+	return [
+		{
+			role: "system",
+			content: `I am a news RSS analyzer that delivers news analyzing RSS.
 		The response must be a valid JSON with the following structure: "${JSON.stringify(responseExample)}".
+		The summary should be enough descriptive, between 100 and 250 words.
     Each item refers to a news item and groups all the information from all sources, with the corresponding links to each media outlet.
     The images should be proper image type format, from the respective related RSS feeds.
-    The RSS I will analyze are: "${JSON.stringify(RSS_LIST)}"
-		If some RSS is blocked by network just ignore them.
-		If all content is unreachable, retrun an empty array.
+    The RSS I will analyze is: "${encode(feedContent)}"
+		If all content is unreachable, return an empty array.
 		`,
-	},
-	{
-		role: "user",
-		content: `Deliver the latest most important news.`,
-	},
-]
+		},
+		{
+			role: "user",
+			content: `Deliver the latest most important news.`,
+		},
+	]
+}
 
 export async function getNews() {
 	try {
-		const response = await openai.responses.create({
-			model: "gpt-5-mini",
-			input,
-			tools: [{ type: "web_search_preview" }],
+		const itemsPromises = RSS_LIST.map(async (rss) => {
+			const response = await openai.responses.create({
+				model: "gpt-5-mini",
+				input: await createRSSInput(rss),
+			})
+
+			const parsed = (await JSON.parse(response.output_text)) as {
+				items: NewsItem[]
+			}
+
+			const { items } = parsed
+
+			return items
 		})
 
-		const parsed = (await JSON.parse(response.output_text)) as {
-			feeds: [string]
+		const items = await Promise.all(itemsPromises)
+
+		const flattenedItems = items.flat()
+
+		const response = await openai.responses.create({
+			model: "gpt-5-mini",
+			input: [
+				{
+					role: "system",
+					content: `I am a news analyzer that delivers a summary of news analyzing news from different sources.
+						The response must be a valid JSON with the following structure: "${JSON.stringify(responseExample)}".
+						The summary should be enough descriptive, between 100 and 300 words.
+						Each item refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
+						The images should be proper image type format, from the respective related RSS feeds.
+						The news I will analyze is: "${encode(flattenedItems)}"
+					`,
+				},
+				{
+					role: "user",
+					content: `Deliver the latest most important news.`,
+				},
+			],
+		})
+
+		const finalParsed = (await JSON.parse(response.output_text)) as {
 			items: NewsItem[]
 		}
 
-		const { items } = parsed
+		const finalItems = finalParsed.items
 
-		console.log({ items })
-
-		return items
+		return finalItems
 	} catch (e) {
 		console.error(e)
 
 		return []
 	}
 }
+
+getNews()

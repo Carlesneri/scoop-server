@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@hono/node-server": "^1.19.8",
 		"@libsql/client": "^0.17.0",
+		"@toon-format/toon": "^2.1.0",
 		"hono": "^4.11.3",
 		"openai": "^6.15.0"
 	}
