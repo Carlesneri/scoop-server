@@ -34,6 +34,10 @@ export async function insertNewsItem({
 }
 
 export async function insertNews(items: NewsItemRow[]) {
-	const promises = items.map((item) => insertNewsItem(item))
-	await Promise.allSettled(promises)
+	try {
+		const promises = items.map((item) => insertNewsItem(item))
+		await Promise.allSettled(promises)
+	} catch (error) {
+		console.error(error)
+	}
 }
