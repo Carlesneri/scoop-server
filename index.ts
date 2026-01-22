@@ -49,7 +49,10 @@ const RSS_LIST = [
 	"https://feeds.bbci.co.uk/news/rss.xml",
 	"http://rss.cnn.com/rss/cnn_topstories.rss",
 	"https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-
+	"https://www.theguardian.com/world/rss",
+	"https://www.aljazeera.com/xml/rss/all.xml",
+	"https://www.rt.com/rss/news/",
+	"https://www.france24.com/en/rss",
 	// "https://www.infolibre.es/rss",
 	// "https://www.eldiario.es/rss",
 	// "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/ultimas-noticias/portada",
