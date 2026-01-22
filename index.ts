@@ -85,8 +85,6 @@ export async function getNews() {
 				input: await createRSSInput(rss),
 			})
 
-			console.log({ response })
-
 			const parsed = (await JSON.parse(response.output_text)) as {
 				items: NewsItem[]
 			}
@@ -97,8 +95,6 @@ export async function getNews() {
 		})
 
 		const items = await Promise.all(itemsPromises)
-
-		console.log({ items })
 
 		const flattenedItems = items.flat()
 
@@ -122,15 +118,11 @@ export async function getNews() {
 			],
 		})
 
-		console.log({ response })
-
 		const finalParsed = (await JSON.parse(response.output_text)) as {
 			items: NewsItem[]
 		}
 
 		const finalItems = finalParsed.items
-
-		console.log({ finalItems })
 
 		return finalItems
 	} catch (e) {
