@@ -11,6 +11,7 @@ export interface NewsItemRow {
 	summary: string
 	urls: { link: string; source: string }[]
 	images: { link: string; source: string }[]
+	tags?: string[]
 }
 
 export async function insertNewsItem({
@@ -18,15 +19,17 @@ export async function insertNewsItem({
 	summary,
 	urls,
 	images,
+	tags = [],
 }: NewsItemRow) {
 	return await turso
 		.execute(
-			"INSERT INTO news (title, summary, urls, images, created_at) VALUES (?, ?, ?, ?, ?);",
+			"INSERT INTO news (title, summary, urls, images, tags, created_at) VALUES (?, ?, ?, ?, ?, ?);",
 			[
 				title,
 				summary,
 				JSON.stringify(urls),
 				JSON.stringify(images),
+				JSON.stringify(tags),
 				Date.now(),
 			],
 		)

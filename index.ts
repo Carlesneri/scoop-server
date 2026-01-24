@@ -11,6 +11,38 @@ import type { NewsItem } from "./types.ts"
 // 	images: [{ link: "string", source: "string" }],
 // }
 
+const TAGS = [
+	"Politics",
+	"Government",
+	"World",
+	"Business",
+	"Economy",
+	"Finance",
+	"Technology",
+	"Science",
+	"Health",
+	"Law & Justice",
+	"Crime",
+	"Society",
+	"Education",
+	"Environment",
+	"Energy",
+	"Media",
+	"Culture",
+	"Entertainment",
+	"Sports",
+	"Infrastructure",
+	"Events",
+	"Travel",
+	"Weather",
+	"Human Rights",
+	"Conflict",
+	"Security",
+	"Defense",
+	"Opinion",
+	"Lifestyle",
+]
+
 const responseExample = {
 	items: [
 		{
@@ -36,6 +68,7 @@ const responseExample = {
 					source: "feed-two",
 				},
 			],
+			tags: ["Politics", "World"],
 		},
 	],
 }
@@ -69,6 +102,7 @@ async function createRSSInput(rss: string): Promise<ResponseInput> {
 		The summary should be enough descriptive, between 100 and 250 words.
     Each item refers to a news item and groups all the information from all sources, with the corresponding links to each media outlet.
     The images should be proper image type format, from the respective related RSS feeds.
+		Avoid logo images or images not related to the news, such as "https://www.aljazeera.com/images/logo_aje.png".
     The RSS I will analyze is: "${encode(feedContent)}"
 		If all content is unreachable, return an empty array.
 		`,
@@ -109,6 +143,7 @@ export async function getNews() {
 					content: `I am a news analyzer that delivers a summary of news analyzing news from different sources.
 						The response must be a valid JSON with the following structure: "${JSON.stringify(responseExample)}".
 						The summary should be enough descriptive, between 100 and 300 words.
+						Add the most relevant tags to each news item. There are some general tags but you can add others: ${TAGS.join(", ")}.
 						Each item refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
 						The images should be proper image type format, from the respective related RSS feeds.
 						The news I will analyze is: "${encode(flattenedItems)}"

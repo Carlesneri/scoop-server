@@ -1,6 +1,8 @@
-name: Get and insert news in DB on dispatch
+name: Get and insert news in DB
 
 on:
+  schedule:
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
