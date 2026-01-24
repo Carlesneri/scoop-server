@@ -3,7 +3,7 @@ name: Get and insert news in DB
 on:
   workflow_dispatch:
   schedule:
-    - cron: "41 * * * *"  # Runs every hour
+    - cron: "0 * * * *"  # Runs every hour
 
 
 jobs:
