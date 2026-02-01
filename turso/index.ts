@@ -12,6 +12,7 @@ export interface NewsItemRow {
 	urls: { link: string; source: string }[]
 	images: { link: string; source: string }[]
 	tags?: string[]
+	created_at?: number
 }
 
 export async function insertNewsItem({
@@ -44,4 +45,15 @@ export async function insertNews(items: NewsItemRow[]) {
 	} catch (error) {
 		console.error(error)
 	}
+}
+
+export async function getLatestNews() {
+  const latestNews = await turso.execute(`
+    SELECT title, created_at
+    FROM news
+    ORDER BY created_at DESC
+    LIMIT 24;
+  `)
+	
+	return latestNews.rows
 }

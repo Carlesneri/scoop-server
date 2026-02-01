@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import type { ResponseInput } from "openai/resources/responses/responses.mjs"
 import { OPENAI_API_KEY } from "./config.ts"
 import type { NewsItem } from "./types.ts"
+import { getLatestNews } from "./turso/index.ts"
 
 // const itemInterface = {
 // 	title: "string",
@@ -135,6 +136,8 @@ export async function getNews() {
 
 		const flattenedItems = items.flat()
 
+		const latestNews = await getLatestNews()
+
 		const response = await openai.responses.create({
 			model: "gpt-5-mini",
 			input: [
@@ -146,7 +149,8 @@ export async function getNews() {
 						Add the most relevant tags to each news item. There are some general tags but you can add others: ${TAGS.join(", ")}.
 						Each item refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
 						The images should be proper image type format, from the respective related RSS feeds.
-						The news I will analyze is: "${encode(flattenedItems)}"
+						The news I will analyze is: "${encode(flattenedItems)}".
+						Check <latest-news>"${encode(latestNews)}"</latest-news> so we do not include news we already have in "latest-news".
 					`,
 				},
 				{
