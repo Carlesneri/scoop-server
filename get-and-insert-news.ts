@@ -3,4 +3,9 @@ import { insertNews } from "./turso/index.ts"
 
 const items = await getNews()
 
-insertNews(items)
+const res = await insertNews(items)
+
+if(res?.itemsInserted) {
+  console.log(`${res.itemsInserted} items inserted in DB`)  
+}
+

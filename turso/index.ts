@@ -38,12 +38,19 @@ export async function insertNewsItem({
 }
 
 export async function insertNews(items: NewsItemRow[]) {
+	let itemsInserted = 0
 	try {
 		for (const item of items) {
 			await insertNewsItem(item)
+
+			itemsInserted++
 		}
+
+		return {itemsInserted}
 	} catch (error) {
 		console.error(error)
+
+		return null
 	}
 }
 
