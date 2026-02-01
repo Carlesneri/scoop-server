@@ -155,7 +155,9 @@ export async function getNews() {
 				},
 				{
 					role: "user",
-					content: `Deliver the latest most important news.`,
+					content: `Deliver the latest most important news.
+						Check <latest-news>"${encode(latestNews)}"</latest-news> so you do not include news that already are in "latest-news".
+					`,
 				},
 			],
 		})
