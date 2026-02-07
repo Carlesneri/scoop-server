@@ -3,8 +3,6 @@ import { insertNews } from "./turso/index.ts"
 
 const items = await getNews()
 
-console.table(items)
-
 const res = await insertNews(items)
 
 if (res?.itemsInserted) {
