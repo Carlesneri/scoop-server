@@ -1,12 +1,13 @@
 name: Get and insert news
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */5 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:
     runs-on: ubuntu-latest
     env:
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}

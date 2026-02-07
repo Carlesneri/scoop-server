@@ -46,7 +46,7 @@ export async function insertNews(items: NewsItemRow[]) {
 			itemsInserted++
 		}
 
-		return {itemsInserted}
+		return { itemsInserted }
 	} catch (error) {
 		console.error(error)
 
@@ -54,13 +54,13 @@ export async function insertNews(items: NewsItemRow[]) {
 	}
 }
 
-export async function getLatestNews() {
-  const latestNews = await turso.execute(`
+export async function getLatestNews({ limit = 24 }: { limit?: number } = {}) {
+	const latestNews = await turso.execute(`
     SELECT title, created_at
     FROM news
     ORDER BY created_at DESC
-    LIMIT 24;
+    LIMIT ${limit};
   `)
-	
+
 	return latestNews.rows
 }
