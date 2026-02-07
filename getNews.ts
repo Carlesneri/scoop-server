@@ -106,9 +106,7 @@ export async function getNews() {
 
 			const splittedContent = feedContent.split(" ")
 
-			console.log({ rss, splittedContentLength: splittedContent.length })
-
-			const slicedContent = splittedContent.slice(0, 10000).join(" ")
+			const slicedContent = splittedContent.slice(0, 15000).join(" ")
 
 			const response = await openai.chat.completions.create({
 				model: MODEL,
