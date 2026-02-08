@@ -78,7 +78,7 @@ const openai = new OpenAI({
 	apiKey: DEEPSEEK_API_KEY,
 })
 
-const MODEL = "deepseek-chat"
+const MODEL = "deepseek-reasoner"
 
 const RSS_LIST = [
 	"https://www.rt.com/rss/news/",
@@ -106,7 +106,7 @@ export async function getNews() {
 
 			const splittedContent = feedContent.split(" ")
 
-			const slicedContent = splittedContent.slice(0, 15000).join(" ")
+			const slicedContent = splittedContent.slice(0, 30000).join(" ")
 
 			const response = await openai.chat.completions.create({
 				model: MODEL,
@@ -144,7 +144,7 @@ export async function getNews() {
 			}
 		}
 
-		const latestNews = await getLatestNews({ limit: 12 })
+		const latestNews = await getLatestNews({ limit: 24 })
 
 		const response = await openai.chat.completions.create({
 			model: MODEL,
@@ -162,7 +162,7 @@ export async function getNews() {
 				{
 					role: "user",
 					content: `Analyze "${encode(responses)}" and deliver the latest most important articles.
-					Check <latest-news>"${encode(latestNews)}"</latest-news> so you do not include news that have been already analyzed.`,
+					Check <latest-news>"${encode(latestNews)}"</latest-news> so you do not include news that are already included.`,
 				},
 			],
 		})
