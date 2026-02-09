@@ -23,4 +23,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run news script
-        run: npm run ${{ inputs.file-name }}
+        run: node ${{ inputs.file-name }}
