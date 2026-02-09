@@ -1,0 +1,26 @@
+name: Get and insert news
+on:
+  workflow_call:
+    inputs: 
+       file-name:
+        required: true  
+        type: string
+jobs:
+  get-insert-news:
+    runs-on: ubuntu-latest
+    env:
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '24.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Run news script
+        run: node {{ inputs.file-name }}

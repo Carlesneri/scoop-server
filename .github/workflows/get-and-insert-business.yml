@@ -1,10 +1,10 @@
-name: Get and insert news
+name: Get and insert tech news
 on:
   schedule:
-    - cron: "0 */3 * * *"
+    - cron: "45 */3 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:
     uses: ./.github/workflows/reusable-get-news.yml
     with:
-      file-name: get-and-insert-news.ts
+      file-name: get-and-insert-business.ts
