@@ -1,4 +1,4 @@
-name: Get and insert tech news
+name: Get and insert business news
 on:
   schedule:
     - cron: "45 */3 * * *"
