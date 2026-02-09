@@ -7,5 +7,5 @@ jobs:
   get-insert-news:
     uses: ./.github/workflows/reusable-get-news.yml
     with:
-      file-name: business
+      file-name: get-and-insert-business.ts
     secrets: inherit
