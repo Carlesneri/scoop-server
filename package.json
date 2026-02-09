@@ -6,6 +6,7 @@
 	"scripts": {
 		"start": "node index.ts",
 		"news": "node get-and-insert-news.ts",
+  "business": "node get-and-insert-business.ts",
 		"dev": "node --watch index.ts"
 	},
 	"keywords": [],
