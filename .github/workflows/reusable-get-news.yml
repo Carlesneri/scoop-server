@@ -1,4 +1,4 @@
-name: Get and insert news
+name: Reusable get and insert news
 on:
   workflow_call:
     inputs: 
