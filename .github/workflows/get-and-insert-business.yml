@@ -7,4 +7,4 @@ jobs:
   get-insert-news:
     uses: ./.github/workflows/reusable-get-news.yml
     with:
-      file-name: get-and-insert-business.ts
+      file-name: business
