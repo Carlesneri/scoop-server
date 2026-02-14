@@ -1,7 +1,7 @@
 name: Get and insert latest news
 on:
   schedule:
-    - cron: "15 2,8,14,20 * * *"
+    - cron: "15 2,10,18 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:

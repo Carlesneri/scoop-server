@@ -1,7 +1,7 @@
 name: Get and insert sport news
 on:
   schedule:
-  - cron: "30 4,10,16,22 * * *"
+  - cron: "30 4,12,20 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:
