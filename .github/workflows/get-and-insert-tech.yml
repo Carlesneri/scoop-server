@@ -1,7 +1,7 @@
 name: Get and insert tech news
 on:
   schedule:
-  - cron: "45 6,14,22 * * *"
+  - cron: "45 1,5,9,13,17,21 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:
