@@ -49,7 +49,13 @@ const TAGS = [
 export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 	try {
 		const rssResponsePromise = (rss: string) => async () => {
-			const feedContent = await fetch(rss).then((res) => res.text())
+			const feedContent = await fetch(rss)
+				.then((res) => res.text())
+				.catch((e) => {
+					console.error(`Error fetching RSS ${rss}:`, e)
+
+					return ""
+				})
 
 			const splittedContent = feedContent.split(" ")
 
@@ -63,11 +69,11 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 						content: `I am a news RSS analyzer that delivers news analyzing RSS.
 						My language is english.
 						The RSS I am analyzing is: "${encode(slicedContent)}"
-						The response must be a list of news items, each containing a summary, the related images, and the link to the news article.
-						The summary should be enough descriptive, between 200 and 250 words.
+						The response must be a list of news items, each containing the content, the related images, and the link to the news article.
+						The content should be enough descriptive, between 200 and 250 words.
 						The images should be proper image type format, from the respective related RSS feed.
 						Avoid logo images, such as "https://www.aljazeera.com/images/logo_aje.png".
-						If all content is unreachable, return an empty string.`,
+						`,
 					},
 					{
 						role: "user",
@@ -122,7 +128,8 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 				{
 					role: "system",
 					content: `I am a news analyzer that delivers a list of articles analyzing news from different sources.
-					The summary should be enough descriptive, between 100 and 300 words.
+					The title of each article should be a concise and catchy headline that summarizes the main point of the article in a few words.
+					The summary is the content of the article, which should be enough descriptive, between 150 and 300 words.
 					Add the most relevant tags to each article, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
 					Each article refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
 					The images should be proper image type format, from the respective related RSS feeds.
