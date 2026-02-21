@@ -1,5 +1,6 @@
 import { createClient } from "@libsql/client"
 import { TURSO_AUTH_TOKEN, TURSO_DATABASE_URL } from "../config.ts"
+import { sortImages } from "../utils.ts"
 
 export const turso = createClient({
 	url: TURSO_DATABASE_URL || "",
@@ -41,7 +42,9 @@ export async function insertNews(items: NewsItemRow[]) {
 	let itemsInserted = 0
 	try {
 		for (const item of items) {
-			await insertNewsItem(item)
+			const sortedImages = await sortImages(item.images)
+
+			await insertNewsItem({ ...item, images: sortedImages })
 
 			itemsInserted++
 		}

@@ -132,7 +132,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 					The summary is the content of the article, which should be enough descriptive, between 150 and 300 words.
 					Add the most relevant tags to each article, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
 					Each article refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
-					The images should be proper image type format, from the respective related RSS feeds. Sort the images so the most quality with, or the most relevant image goes first.
+					The images should be proper image type format, from the respective related RSS feeds.
 					`,
 				},
 				{

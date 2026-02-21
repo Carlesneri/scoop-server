@@ -17,6 +17,7 @@
 		"node": "24"
 	},
 	"devDependencies": {
+		"@types/probe-image-size": "^7.2.5",
 		"biome": "^0.3.3"
 	},
 	"dependencies": {
@@ -26,6 +27,7 @@
 		"ai": "^6.0.97",
 		"hono": "^4.11.3",
 		"openai": "^6.15.0",
+		"probe-image-size": "^7.2.3",
 		"zod": "^4.3.6"
 	}
 }
