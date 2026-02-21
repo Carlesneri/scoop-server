@@ -1,24 +1,20 @@
 import { encode } from "@toon-format/toon"
-import OpenAI from "openai"
-import { DEEPSEEK_API_KEY } from "./config.ts"
+import { generateText, type LanguageModel, Output } from "ai"
+import z from "zod"
 import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
 
-// const itemInterface = {
-// 	title: "string",
-// 	summary: "string",
-// 	urls: [{ link: "string", source: "string" }],
-// 	images: [{ link: "string", source: "string" }],
-// }
+const RSS_MODEL: LanguageModel = "mistral/devstral-2"
+const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2-thinking"
 
 const TAGS = [
 	"Politics",
 	"Government",
-	"World",
 	"Business",
 	"Economy",
 	"Finance",
 	"Technology",
+	"Robotics",
 	"Science",
 	"Health",
 	"Law & Justice",
@@ -30,7 +26,11 @@ const TAGS = [
 	"Media",
 	"Culture",
 	"Entertainment",
+	"Books",
+	"Movies",
+	"Music",
 	"Sports",
+	"Formula 1",
 	"Infrastructure",
 	"Events",
 	"Travel",
@@ -41,48 +41,10 @@ const TAGS = [
 	"Defense",
 	"Opinion",
 	"Lifestyle",
+	"USA",
+	"Spain",
+	"Valencia",
 ]
-
-const responseExample = {
-	items: [
-		{
-			title: "Example title",
-			summary: "Example summary",
-			urls: [
-				{
-					link: "https://fake-link",
-					source: "feed-one",
-				},
-				{
-					link: "https://fake-link",
-					source: "feed-two",
-				},
-			],
-			images: [
-				{
-					link: "https://fake-img.jpg",
-					source: "feed-one",
-				},
-				{
-					link: "https://fake-img.avif",
-					source: "feed-two",
-				},
-			],
-			tags: ["Politics", "World"],
-		},
-	],
-}
-
-const openai = new OpenAI({
-	baseURL: "https://api.deepseek.com",
-	apiKey: DEEPSEEK_API_KEY,
-})
-
-const MODEL = "deepseek-reasoner"
-
-function responseCleaner(content: string) {
-	return content.replace(/(^```json|\n|```$)/g, "")
-}
 
 export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 	try {
@@ -93,8 +55,8 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 
 			const slicedContent = splittedContent.slice(0, 30000).join(" ")
 
-			const response = await openai.chat.completions.create({
-				model: MODEL,
+			const { text } = await generateText({
+				model: RSS_MODEL,
 				messages: [
 					{
 						role: "system",
@@ -104,7 +66,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 						The response must be a list of news items, each containing a summary, the related images, and the link to the news article.
 						The summary should be enough descriptive, between 200 and 250 words.
 						The images should be proper image type format, from the respective related RSS feed.
-						Avoid logo images or images not related to the news, such as "https://www.aljazeera.com/images/logo_aje.png".
+						Avoid logo images, such as "https://www.aljazeera.com/images/logo_aje.png".
 						If all content is unreachable, return an empty string.`,
 					},
 					{
@@ -114,7 +76,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 				],
 			})
 
-			return response.choices[0].message.content
+			return text
 		}
 
 		const responses: string[] = []
@@ -131,15 +93,37 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 
 		const latestNews = await getLatestNews({ limit: 24 })
 
-		const response = await openai.chat.completions.create({
-			model: MODEL,
+		const response = await generateText({
+			model: NEWS_MODEL,
+			output: Output.object({
+				schema: z.object({
+					items: z.array(
+						z.object({
+							title: z.string(),
+							summary: z.string(),
+							urls: z.array(
+								z.object({
+									link: z.string(),
+									source: z.string(),
+								}),
+							),
+							images: z.array(
+								z.object({
+									link: z.string(),
+									source: z.string(),
+								}),
+							),
+							tags: z.array(z.string()),
+						}),
+					),
+				}),
+			}),
 			messages: [
 				{
 					role: "system",
 					content: `I am a news analyzer that delivers a list of articles analyzing news from different sources.
-					The response must be a valid stringified JSON, ready to be parsed, with the following structure: "${JSON.stringify(responseExample)}".
 					The summary should be enough descriptive, between 100 and 300 words.
-					Add the most relevant tags to each article. There are some general tags but you can add others: ${TAGS.join(", ")}.
+					Add the most relevant tags to each article, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
 					Each article refers to a all news about same or similar information, and groups all the information from all sources, with the corresponding links to each media outlet.
 					The images should be proper image type format, from the respective related RSS feeds.
 					`,
@@ -152,15 +136,14 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 			],
 		})
 
-		const { content } = response.choices[0].message
+		const { text } = response
 
-		if (!content) {
+		if (!text) {
+			console.error("No valid response text found.")
 			return []
 		}
 
-		const cleanedContent = responseCleaner(content)
-
-		const finalParsed = JSON.parse(cleanedContent) as {
+		const finalParsed = JSON.parse(text) as {
 			items: NewsItem[]
 		}
 
