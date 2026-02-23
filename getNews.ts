@@ -128,7 +128,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 				{
 					role: "system",
 					content: `I am a news analyzer that delivers a list of articles analyzing news from different sources.
-					Each article refers to a all news about same or similar information, and groups all the information from all sources.
+					Each article refers to a all news about same information, and groups all the information from all sources.
 					The title of each article should be a concise and catchy headline that summarizes the main or the most interesting point of the article in a few words.
 					The summary is the content of the article, which should be enough descriptive and specific, with the most relevant information included, with no generalities, between 150 and 500 words. You can use Markdown format to structure the content, using paragraphs, lists, and other formatting elements to make it more readable and engaging.
 					The urls are the corresponding links to each media outlet.
