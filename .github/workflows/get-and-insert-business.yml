@@ -1,7 +1,7 @@
 name: Get and insert business news
 on:
   schedule:
-    - cron: "00 0,4,8,12,16,20 * * *"
+    - cron: "15 0,6,12,18 * * *"
   workflow_dispatch: 
 jobs:
   get-insert-news:
