@@ -5,7 +5,7 @@ import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
 
 const RSS_MODEL: LanguageModel = "mistral/devstral-2"
-const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2-thinking"
+const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2"
 
 const TAGS = [
 	"Politics",
@@ -46,6 +46,53 @@ const TAGS = [
 	"Valencia",
 ]
 
+const READ_LABEL_TIME = "read-rss"
+const WRITE_LABEL_TIME = "write-news"
+
+const newsSchema = z.object({
+	items: z.array(
+		z.object({
+			title: z.string(),
+			summary: z.string(),
+			urls: z.array(
+				z.object({
+					link: z.string(),
+					source: z.string(),
+				}),
+			),
+			images: z.array(
+				z.object({
+					link: z.string(),
+					source: z.string(),
+				}),
+			),
+			tags: z.array(z.string()),
+		}),
+	),
+})
+
+const newsExample = {
+	items: [
+		{
+			title: "Here comes the title",
+			summary: "This is the summary of the news",
+			urls: [
+				{
+					link: "https://fakeurl.com",
+					source: "fake rss",
+				},
+			],
+			images: [
+				{
+					link: "https://fakeurl.com",
+					source: "fake rss",
+				},
+			],
+			tags: ["technology, politics, finance"],
+		},
+	],
+}
+
 export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 	try {
 		const rssResponsePromise = (rss: string) => async () => {
@@ -85,6 +132,8 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 			return text
 		}
 
+		console.time(READ_LABEL_TIME)
+
 		const responses: string[] = []
 
 		for (const rss of rssList) {
@@ -97,32 +146,16 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 			}
 		}
 
+		console.timeEnd(READ_LABEL_TIME)
+
 		const latestNews = await getLatestNews({ limit: 24 })
+
+		console.time(WRITE_LABEL_TIME)
 
 		const response = await generateText({
 			model: NEWS_MODEL,
 			output: Output.object({
-				schema: z.object({
-					items: z.array(
-						z.object({
-							title: z.string(),
-							summary: z.string(),
-							urls: z.array(
-								z.object({
-									link: z.string(),
-									source: z.string(),
-								}),
-							),
-							images: z.array(
-								z.object({
-									link: z.string(),
-									source: z.string(),
-								}),
-							),
-							tags: z.array(z.string()),
-						}),
-					),
-				}),
+				schema: newsSchema,
 			}),
 			messages: [
 				{
@@ -134,6 +167,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 					The urls are the corresponding links to each media outlet.
 					The images should be proper image type format, from the respective related RSS feeds.
 					Add the most relevant tags to each article, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
+					Response must meet the interface of this example: "${encode(JSON.stringify(newsExample))}".
 					`,
 				},
 				{
@@ -143,6 +177,8 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 				},
 			],
 		})
+
+		console.timeEnd(WRITE_LABEL_TIME)
 
 		const { text } = response
 

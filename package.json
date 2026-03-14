@@ -21,10 +21,9 @@
 		"biome": "^0.3.3"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.19.8",
 		"@libsql/client": "^0.17.0",
 		"@toon-format/toon": "^2.1.0",
-		"ai": "^6.0.97",
+		"ai": "^6.0.116",
 		"hono": "^4.11.3",
 		"openai": "^6.15.0",
 		"probe-image-size": "^7.2.3",
