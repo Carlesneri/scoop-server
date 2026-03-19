@@ -55,8 +55,8 @@ const TAGS = [
 	"Valencia",
 ]
 
-const READ_LABEL_TIME = "read-rss"
-const WRITE_LABEL_TIME = "write-news"
+const READ_LABEL_TIME = "Analyze RSS news"
+const WRITE_LABEL_TIME = "Generate articles"
 
 const newsSchema = z.object({
 	items: z.array(
