@@ -1,4 +1,6 @@
+import { createGateway } from "ai"
 import imageSize from "probe-image-size"
+import { Agent } from "undici"
 
 export function responseCleaner(content: string) {
 	return content.replace(/(^```json|\n|```$)/g, "")
@@ -29,3 +31,14 @@ export function shuffleRssList(array: string[]) {
 	}
 	return shuffled.slice(0, 5)
 }
+
+export const gateway = createGateway({
+	fetch: (url, init) =>
+		fetch(url, {
+			...init,
+			dispatcher: new Agent({
+				headersTimeout: 15 * 60 * 1000, // 15 minutes
+				bodyTimeout: 15 * 60 * 1000,
+			}),
+		} as RequestInit),
+})

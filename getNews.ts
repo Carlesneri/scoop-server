@@ -1,13 +1,19 @@
 import { encode } from "@toon-format/toon"
-import { generateText, type LanguageModel, Output } from "ai"
+import {
+	type GatewayModelId,
+	generateText,
+	type LanguageModel,
+	Output,
+} from "ai"
+
 import z from "zod"
 import { RESPONSES_EXAMPLE } from "./responses-example.ts"
 import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
-import { shuffleRssList } from "./utils.ts"
+import { gateway, shuffleRssList } from "./utils.ts"
 
 const RSS_MODEL: LanguageModel = "mistral/ministral-3b"
-const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2-thinking"
+const NEWS_MODEL: GatewayModelId = "deepseek/deepseek-v3.2-thinking"
 const TESTING = false
 
 const TAGS = [
@@ -160,7 +166,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 		console.time(WRITE_LABEL_TIME)
 
 		const response = await generateText({
-			model: NEWS_MODEL,
+			model: gateway.chat(NEWS_MODEL),
 			output: Output.object({
 				schema: newsSchema,
 			}),
@@ -206,6 +212,10 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 		}
 
 		const finalItems = finalParsed.items
+
+		if (TESTING) {
+			console.log({ finalItems })
+		}
 
 		return TESTING ? [] : finalItems
 	} catch (e) {
