@@ -5,7 +5,7 @@ import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
 
 const RSS_MODEL: LanguageModel = "mistral/ministral-3b"
-const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2"
+const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2-thinking"
 
 const TAGS = [
 	"Politics",
