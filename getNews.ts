@@ -1,11 +1,14 @@
 import { encode } from "@toon-format/toon"
 import { generateText, type LanguageModel, Output } from "ai"
 import z from "zod"
+import { RESPONSES_EXAMPLE } from "./responses-example.ts"
 import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
+import { shuffleRssList } from "./utils.ts"
 
 const RSS_MODEL: LanguageModel = "mistral/ministral-3b"
 const NEWS_MODEL: LanguageModel = "deepseek/deepseek-v3.2-thinking"
+const TESTING = false
 
 const TAGS = [
 	"Politics",
@@ -94,6 +97,8 @@ const newsExample = {
 }
 
 export async function getNews(rssList: string[]): Promise<NewsItem[]> {
+	const shuffledRssList = shuffleRssList(rssList)
+
 	try {
 		const rssResponsePromise = (rss: string) => async () => {
 			const feedContent = await fetch(rss)
@@ -134,21 +139,23 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 
 		console.time(READ_LABEL_TIME)
 
-		const responses: string[] = []
+		const responses: string[] = TESTING ? RESPONSES_EXAMPLE : []
 
-		for (const rss of rssList) {
-			const rssResponse = await rssResponsePromise(rss)().catch((e) => {
-				console.error(`Error processing RSS ${rss}:`, e)
-			})
+		if (!TESTING) {
+			for (const rss of shuffledRssList) {
+				const rssResponse = await rssResponsePromise(rss)().catch((e) => {
+					console.error(`Error processing RSS ${rss}:`, e)
+				})
 
-			if (rssResponse) {
-				responses.push(rssResponse)
+				if (rssResponse) {
+					responses.push(rssResponse)
+				}
 			}
 		}
 
 		console.timeEnd(READ_LABEL_TIME)
 
-		const latestNews = await getLatestNews({ limit: 24 })
+		const latestNews = TESTING ? [] : await getLatestNews({ limit: 24 })
 
 		console.time(WRITE_LABEL_TIME)
 
@@ -160,23 +167,25 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 			messages: [
 				{
 					role: "system",
-					content: `I am a news analyzer that delivers a list of opinion articles analyzing news from different sources.
-					The opinion stems from a perspective that is favorable to human rights and environmentalism, and critical of capitalism.
-					The articles should be opinionated, highlighting the funny part of the story, if there is any, or commenting on it sarcastically, but without straying from the truth.
-					Specific data provided, like names, dates, etc., must be veridic, and omit it if it cannot be verified.
+					content: `I am a jounalist that delivers a list of opinion articles analyzing news from different sources.
+					My opinion stems from a perspective that is favorable to human rights and environmentalism, and critical of capitalism.
+					My articles highlight the funny or ironic part of the story, if there is any, or comment on it sarcastically, but without straying from the truth.
+					I do not mention explicity to be against capitalism or other personal opinion.
+					Specific data provided, like names, dates, etc., are veridic, either are omited.
 					Each article refers to a all news about same information, and groups all the information from all sources.
 					The title of each article should be a concise and catchy headline, that refears to the main or the most interesting point of the article, always specific, with no generalities, no more than 20 words long.
-					The summary is the content of the article, which should be enough descriptive and specific, with the most relevant information included, with no generalities, between 150 and 500 words. You can use Markdown format to structure the content, using paragraphs, lists, and other formatting elements to make it more readable and engaging.
+					The summary is the content of the article, which should be enough descriptive and specific, with the most relevant information included, with no generalities, between 150 and 500 words.
 					The urls are the corresponding links to each media outlet.
 					The images should be proper image type format, from the respective related RSS feeds.
-					Add the most relevant tags to each article, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
-					Response must meet the interface of this example: "${encode(JSON.stringify(newsExample))}".
+					Most relevant tags to each article are added, up to 5 tags. There are some general tags but you can add others: ${TAGS.join(", ")}.
+					I can use Markdown format to structure the content of the summary, using paragraphs, lists, and other formatting elements to make it more readable and engaging.
+					Response meet the interface of this example: "${encode(JSON.stringify(newsExample))}".
 					`,
 				},
 				{
 					role: "user",
-					content: `Analyze "${encode(responses)}" and deliver the latest most important articles.
-					Check <latest-news>"${encode(latestNews)}"</latest-news> so you do not include news that are already included.`,
+					content: `Analyze <sources>"${encode(responses)}"<sources> and deliver the latest most important articles.
+					Check <latest-news>"${encode(latestNews)}"<latest-news> so you do not include news that are already included.`,
 				},
 			],
 		})
@@ -196,7 +205,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 
 		const finalItems = finalParsed.items
 
-		return finalItems
+		return TESTING ? [] : finalItems
 	} catch (e) {
 		console.error(e)
 
