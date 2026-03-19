@@ -1,7 +1,7 @@
 import { encode } from "@toon-format/toon"
 import { generateText, type LanguageModel, Output } from "ai"
 import z from "zod"
-import { getLatestNews } from "./turso"
+import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
 
 const RSS_MODEL: LanguageModel = "mistral/ministral-3b"
