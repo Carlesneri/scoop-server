@@ -1,6 +1,8 @@
-import { createGateway } from "ai"
+import { encode } from "@toon-format/toon"
+import { createGateway, generateImage } from "ai"
 import imageSize from "probe-image-size"
 import { Agent } from "undici"
+import type { NewsItemRow } from "./turso"
 
 export function responseCleaner(content: string) {
 	return content.replace(/(^```json|\n|```$)/g, "")
@@ -42,3 +44,25 @@ export const gateway = createGateway({
 			}),
 		} as RequestInit),
 })
+
+export async function addAiImageToArticle(items: NewsItemRow[]) {
+	const addImagePromises = items.map(async (item) => {
+		try {
+			const response = await generateImage({
+				model: gateway.image("recraft/recraft-v4"),
+				prompt: `Generate an image that describes this summary <summary>${encode(item.summary)}<summary>`,
+				n: 1,
+			})
+
+			return { ...item, mainImage: response.images?.[0]?.base64 }
+		} catch (error) {
+			console.error(error)
+
+			return { ...item, mainImage: "" }
+		}
+	})
+
+	const finalItems = await Promise.all(addImagePromises)
+
+	return finalItems
+}

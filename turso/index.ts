@@ -10,6 +10,7 @@ export const turso = createClient({
 export interface NewsItemRow {
 	title: string
 	summary: string
+	mainImage?: string
 	urls: { link: string; source: string }[]
 	images: { link: string; source: string }[]
 	tags?: string[]
@@ -19,16 +20,18 @@ export interface NewsItemRow {
 export async function insertNewsItem({
 	title,
 	summary,
+	mainImage = "",
 	urls,
 	images,
 	tags = [],
 }: NewsItemRow) {
 	return await turso
 		.execute(
-			"INSERT INTO news (title, summary, urls, images, tags, created_at) VALUES (?, ?, ?, ?, ?, ?);",
+			"INSERT INTO news (title, summary, mainImage, urls, images, tags, created_at) VALUES (?, ?, ?, ?, ?, ?, ?);",
 			[
 				title,
 				summary,
+				mainImage,
 				JSON.stringify(urls),
 				JSON.stringify(images),
 				JSON.stringify(tags),
