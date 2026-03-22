@@ -1,18 +1,12 @@
 import { encode } from "@toon-format/toon"
-import {
-	type GatewayModelId,
-	generateText,
-	type LanguageModel,
-	Output,
-} from "ai"
+import { type GatewayModelId, generateText, Output } from "ai"
 
 import z from "zod"
-import { RESPONSES_EXAMPLE } from "./responses-example.ts"
 import { getLatestNews } from "./turso/index.ts"
 import type { NewsItem } from "./types.ts"
 import { gateway, shuffleRssList } from "./utils.ts"
 
-const RSS_MODEL: LanguageModel = "mistral/ministral-3b"
+const RSS_MODEL: GatewayModelId = "amazon/nova-lite"
 const NEWS_MODEL: GatewayModelId = "deepseek/deepseek-v3.2-thinking"
 const TESTING = false
 
@@ -111,16 +105,18 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 				.then((res) => res.text())
 				.catch((e) => {
 					console.error(`Error fetching RSS ${rss}:`, e)
-
-					return ""
 				})
+
+			if (!feedContent) {
+				return null
+			}
 
 			const splittedContent = feedContent.split(" ")
 
 			const slicedContent = splittedContent.slice(0, 30000).join(" ")
 
 			const { text } = await generateText({
-				model: RSS_MODEL,
+				model: gateway.chat(RSS_MODEL),
 				messages: [
 					{
 						role: "system",
@@ -135,7 +131,7 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 					},
 					{
 						role: "user",
-						content: `Deliver the latest 10 most important news.`,
+						content: `Deliver the latest, at most 7, most important news.`,
 					},
 				],
 			})
@@ -145,21 +141,23 @@ export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 
 		console.time(READ_LABEL_TIME)
 
-		const responses: string[] = TESTING ? RESPONSES_EXAMPLE : []
+		const responses: string[] = []
 
-		if (!TESTING) {
-			for (const rss of shuffledRssList) {
-				const rssResponse = await rssResponsePromise(rss)().catch((e) => {
-					console.error(`Error processing RSS ${rss}:`, e)
-				})
+		for (const rss of shuffledRssList) {
+			const rssResponse = await rssResponsePromise(rss)().catch((e) => {
+				console.error(`Error processing RSS ${rss}:`, e)
+			})
 
-				if (rssResponse) {
-					responses.push(rssResponse)
-				}
+			if (rssResponse) {
+				responses.push(rssResponse)
 			}
 		}
 
 		console.timeEnd(READ_LABEL_TIME)
+
+		if (TESTING) {
+			console.log({ responses })
+		}
 
 		const latestNews = TESTING ? [] : await getLatestNews({ limit: 24 })
 
