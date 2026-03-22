@@ -99,6 +99,8 @@ const newsExample = {
 export async function getNews(rssList: string[]): Promise<NewsItem[]> {
 	const shuffledRssList = shuffleRssList(rssList)
 
+	console.info({ RSS_MODEL, NEWS_MODEL, shuffledRssList })
+
 	try {
 		const rssResponsePromise = (rss: string) => async () => {
 			const feedContent = await fetch(rss)
